@@ -1,0 +1,26 @@
+version: 1
+policy:
+  pullRequests: collaborators
+tasks:
+  $match:
+    '(tasks_for == "github-pull-request" && event["action"] in ["opened","reopened","synchronize"])':
+      taskId:
+        $eval: as_slugid("pr_task")
+      provisionerId: aws-provisioner-v1
+      workerType: github-worker
+      payload:
+        maxRunTime: 3600
+        image: node
+        command:
+          - /bin/bash
+          - '--login'
+          - '-c'
+          - >-
+            git clone {{event.head.repo.url}} repo && cd repo && git config
+            advice.detachedHead false && git checkout {{event.head.sha}} && npm
+            install . && npm test
+      metadata:
+        name: foo
+        description: bar
+        owner: '${event.sender.login}@users.noreply.github.com'
+        source: '${event.repository.url}'
