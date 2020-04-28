@@ -6,18 +6,10 @@ tasks:
     '(tasks_for == "github-pull-request" && event["action"] in ["opened","reopened","synchronize"])':
       taskId:
         $eval: as_slugid("pr_task")
-      provisionerId: aws-provisioner-v1
-      workerType: github-worker
-      deadline: {$fromNow: '1 day'}
-      payload:
-        maxRunTime: 3600
-        image: node
-        command:
-          - /bin/bash
-          - '--login'
-          - '-c'
-          - >-
-            echo HELLO WORLD
+      provisionerId: built-in
+      workerType: succeed
+      deadline: {$fromNow: '1 minute'}
+      payload: {}
       metadata:
         name: foo
         description: bar
